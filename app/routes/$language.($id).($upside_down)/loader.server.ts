@@ -25,7 +25,7 @@ const getContent = async (language: string) => {
 		try {
 			return [JSON.parse(value) as GetAllPagesData, null] as const
 		} catch (error) {
-			console.log(new Date(), 'getContent cannot parse cached value\n', error)
+			console.error(new Date(), 'getContent cannot parse cached value\n', error)
 			await removeItem(key)
 		}
 
@@ -39,14 +39,14 @@ const getContent = async (language: string) => {
 	return [data, null] as const
 }
 
-async function getCardById(language: string, id: string) {
+async function getCardById({ language, id }: { language: string, id: string }) {
 	const key = JSON.stringify(['tarot', 'card', language, id])
 	const value = await getItem(key)
 	if (value) {
 		try {
 			return [JSON.parse(value) as TarotCard | null, null] as const
 		} catch (error) {
-			console.log(new Date(), 'getCardById cannot JSON.parse cached value\n', error)
+			console.error(new Date(), 'getCardById cannot JSON.parse cached value\n', error)
 			await removeItem(key)
 		}
 	}
@@ -69,7 +69,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	if (id && (upside_down == '1' || upside_down == '0')) {
 		const [cardResponse, contentResponse] = await Promise.all([
-			getCardById(language, id),
+			getCardById({ language, id }),
 			contentPromise,
 		])
 
@@ -114,6 +114,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		),
 		contentPromise,
 	])
+
 
 	const [card, errorGettingCard] = nextCardResponse
 	const [content, errorGettingContent] = contentResponse

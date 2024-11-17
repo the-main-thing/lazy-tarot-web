@@ -7,9 +7,10 @@ apiEndpoint = apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint
 import type { Router } from './api.types'
 
 function endpoint(path: `/${string}`, ...params: Array<string>): URL {
+	path = path.endsWith('/') ? path.slice(0, -1) as `/${string}` : path
 	path = `${path}/${params.filter(Boolean).join('/')}`
 	if (path.endsWith('/')) {
-		return new URL(path.slice(-1), apiEndpoint)
+		return new URL(path.slice(0, -1), apiEndpoint)
 	}
 	return new URL(path, apiEndpoint)
 }
@@ -39,6 +40,9 @@ async function getAllPages(language: string) {
 		method: 'GET',
 		headers: headers(),
 	})
+	if (response.status >= 400) {
+		throw response
+	}
 	return await response.json() as Router['get-all-pages']['data']
 }
 
@@ -52,8 +56,11 @@ async function getRandomCard(language: string, prevPickedCards: z.infer<typeof p
 	const response = await fetch(endpoint('/get-random-card', language), {
 		method: 'POST',
 		headers: headers(),
-		body: JSON.stringify({ prevPickedCards: prevPickedCardsInputSchema.parse(prevPickedCards) })
+		body: JSON.stringify(prevPickedCardsInputSchema.parse(prevPickedCards))
 	})
+	if (response.status >= 400) {
+		throw response
+	}
 	return await response.json() as Router['get-random-card']['data']
 }
 
@@ -62,6 +69,9 @@ async function getCardsSet(language: string) {
 		method: 'GET',
 		headers: headers(),
 	})
+	if (response.status >= 400) {
+		throw response
+	}
 	return await response.json() as Router['get-cards-set']['data']
 }
 
@@ -70,6 +80,9 @@ async function getCardById(language: string, id: string) {
 		method: 'GET',
 		headers: headers(),
 	})
+	if (response.status >= 400) {
+		throw response
+	}
 	return await response.json() as Router['get-card-by-id']['data']
 }
 

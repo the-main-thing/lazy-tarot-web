@@ -6,13 +6,13 @@ const STALE_TIME = 1000 * 60 * 60 * 1 // 1 hour
 
 export async function getItem(key: string, staleTime = STALE_TIME) {
 	try {
-		const data = await db.select().from(cache).where(eq(cache.key, key)).limit(1)
-		if (!data.length) {
+		const data = await db.query.cache.findFirst({ where: eq(cache.key, key) })
+		if (!data) {
 			return null
 		}
-		const { updatedAt } = data[0]
+		const { updatedAt } = data
 		if (updatedAt + staleTime > Date.now()) {
-			return data[0].value
+			return data.value
 		}
 		await removeItem(key)
 		return null

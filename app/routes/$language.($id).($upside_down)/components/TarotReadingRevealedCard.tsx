@@ -125,7 +125,7 @@ export const TarotReadingRevealedCard = forwardRef<HTMLDivElement, Props>(
 						value={tarotReadingPageContent.pickedCardTitle}
 					/>
 				</animated.div>
-				<div className="flex landscape:flex-row portrait:flex-col-reverse gap-16 md:gap-16">
+				<div className="flex landscape:flex-row portrait:flex-col-reverse gap-16 md:gap-16 w-full">
 					{content}
 					{children}
 				</div>
