@@ -103,7 +103,7 @@ const DeckButton = memo(
 									key={index}
 									revealed={revealed}
 									upsideDown={pickedCard.upsideDown}
-									onChange={onFlipped}
+									onFlipped={onFlipped}
 									sizeClassName={classNames(
 										'will-change-transform',
 										sizeClassName,

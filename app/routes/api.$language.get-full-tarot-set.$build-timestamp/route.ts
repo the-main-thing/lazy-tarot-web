@@ -1,9 +1,8 @@
 import { type LoaderFunctionArgs } from '@remix-run/node'
 
-import { api } from '~/api.server'
+import { api, CardsSet } from '~/api.server'
 import { getItem, setItem } from '~/cache-storage.server'
 import { getLanguageFromParams } from '~/utils/i18n.server'
-import type { GetCardsSetData } from '~/api.types'
 
 const MINUTE_IN_SECONDS = 60
 const HOUR_IN_SECONDS = MINUTE_IN_SECONDS * 60
@@ -12,7 +11,7 @@ const getData = async (language: string) => {
 	const key = JSON.stringify(['tarot', 'cards-set', language])
 	const cached = await getItem(key)
 	if (cached) {
-		return [JSON.parse(cached) as GetCardsSetData, null] as const
+		return [JSON.parse(cached) as CardsSet, null] as const
 	}
 	const [data, error] = await api.getCardsSet(language)
 	if (error) {
@@ -41,4 +40,4 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	})
 }
 
-export type LoaderData = GetCardsSetData
+export type LoaderData = CardsSet

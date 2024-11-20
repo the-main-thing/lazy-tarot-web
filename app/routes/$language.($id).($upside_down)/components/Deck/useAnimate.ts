@@ -212,6 +212,7 @@ export const useAnimate = (
 	const [state, send] = useAnimationState()
 	useEffect(() => {
 		if (state === 'hiding_wiping_deck_off') {
+			api.stop()
 			api.start((i) => {
 				const config = getShuffleStart(i)
 				if (i === DECK_SIZE - 1) {
@@ -230,6 +231,7 @@ export const useAnimate = (
 			return
 		}
 		if (state === 'hiding_replacing_deck') {
+			api.stop()
 			api.set(fromShuffle)
 			api.start((i) => {
 				const config = getShuffleEnd(i)
@@ -242,8 +244,15 @@ export const useAnimate = (
 		}
 
 		if (state === 'revealing_flipping_card') {
+			api.stop()
 			api.start((i) => {
-				const config = getRevealedStyle(i, {})
+				const config = getRevealedStyle(i, {
+					onRest: () => {
+						if (i === DECK_SIZE - 1) {
+							send({ type: 'CARD_FLIPPED' })
+						}
+					}
+				})
 
 				return config
 			})

@@ -3,8 +3,8 @@ import { memo, forwardRef, useState, useEffect } from 'react'
 import classnames from 'classnames'
 
 import { Img } from '~/components'
-import type { GetCardsSetData } from '~/api.types' 
-type Image = GetCardsSetData [number]['image']
+import type { Card as CardType } from '~/api.server'
+type Image = CardType['image']
 
 type ButtonProps = React.ComponentProps<'button'>
 
@@ -24,7 +24,7 @@ interface Props
 	> {
 	revealed: boolean
 	upsideDown: boolean
-	onChange?: (revealed: boolean) => void
+	onFlipped?: (revealed: boolean) => void
 	sizeClassName: string
 	children: React.ReactNode
 	back: Image
@@ -42,7 +42,7 @@ interface CardAsDivProps
 	extends Pick<
 		Props,
 		| 'upsideDown'
-		| 'onChange'
+		| 'onFlipped'
 		| 'revealed'
 		| 'front'
 		| 'back'
@@ -93,7 +93,7 @@ const CardInternal = memo(
 	forwardRef<HTMLElement, CardProps<'button' | 'div'>>(
 		(
 			{
-				onChange,
+				onFlipped,
 				upsideDown,
 				revealed,
 				front,
@@ -109,7 +109,7 @@ const CardInternal = memo(
 					rotateY: revealed ? 180 : 0,
 				},
 				onRest: () => {
-					onChange?.(revealed)
+					onFlipped?.(revealed)
 				},
 			})
 
@@ -196,7 +196,7 @@ const CardInternal = memo(
 		return (
 			prevKeys.every((k) => {
 				const key = k as keyof typeof prev
-				if (key === 'onChange' && prev[key]) {
+				if (key === 'onFlipped' && prev[key]) {
 					return true
 				}
 

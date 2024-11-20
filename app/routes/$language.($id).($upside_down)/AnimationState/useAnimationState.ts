@@ -4,6 +4,8 @@ import { matches } from './matches'
 import type { AnimationState, AnimationEvent, TransitionsMap } from './types'
 import type { ActionData } from '../clientAction'
 import type { useRouteLoadersData } from '../RouteLoadersDataProvider'
+import { useParams } from '@remix-run/react'
+import { useGetCardsSet } from '~/routes/api.$language.get-full-tarot-set.$build-timestamp/useGetCardsSet'
 
 const inBrowser = () => typeof window !== 'undefined'
 
@@ -43,18 +45,24 @@ const transitionsMap: TransitionsMap = {
 			return 'hiding_wiping_deck_off'
 		},
 		REVEAL: () => {
-			return 'idle_revealed'
+			return 'revealing_revealing_content'
 		},
 	},
 	hiding_wiping_deck_off: {
 		DECK_WIPED_OFF: () => {
 			return 'hiding_replacing_deck'
 		},
+		REVEAL: () => {
+			return 'revealing_flipping_card'
+		}
 	},
 	hiding_replacing_deck: {
 		DECK_REPLACED: () => {
 			return 'hiding_revealing_content'
 		},
+		REVEAL: () => {
+			return 'revealing_replacing_deck'
+		}
 	},
 	hiding_revealing_content: {
 		HIDDEN_CONTENT_REVEALED: () => {
@@ -107,10 +115,12 @@ const transitionsMap: TransitionsMap = {
 }
 
 const reducer = (state: AnimationState, event: AnimationEvent) => {
-	return (
+	const nextState = (
 		transitionsMap[state][event.type]?.(state as never, event as never) ||
 		state
 	)
+	console.log(state, event.type, nextState)
+	return nextState
 }
 
 const cardIsVisible = matches([
@@ -128,11 +138,14 @@ export const useAnimationState = ([loaderData, actionData]: [
 	loaderData: ReturnType<typeof useRouteLoadersData>,
 	actionData: ActionData | undefined,
 ]) => {
+	const params = useParams()
+	const { data: cardsSet } = useGetCardsSet(loaderData.language)
 	const [state, send] = useReducer(
 		reducer,
 		loaderData.revealed ? 'idle_ssr_revealed' : 'idle_ssr_hidden',
 	)
-	const [[card, upsideDown], setCard] = useState(() => [
+	// eslint-disable-next-line prefer-const
+	let [[card, upsideDown], setCard] = useState(() => [
 		loaderData.card || loaderData.initialCard,
 		typeof loaderData.upsideDown === 'undefined'
 			? loaderData.initialUpsideDown
@@ -156,6 +169,15 @@ export const useAnimationState = ([loaderData, actionData]: [
 	) {
 		setPrevLoaderCardId(loaderData.card.id)
 		setCard([loaderData.card, Boolean(loaderData.upsideDown)])
+	}
+
+	if (params.id && (params.upside_down === '1' || params.upside_down === '0')) {
+		const paramsUpsideDown = params.upside_down === '1'
+		if (params.id !== card.id || paramsUpsideDown !== upsideDown) {
+			card = cardsSet?.find(({ id }) => id === params.id) || card
+			upsideDown = paramsUpsideDown
+			setCard([card, upsideDown])
+		}
 	}
 
 	return [state, send, card, upsideDown] as const

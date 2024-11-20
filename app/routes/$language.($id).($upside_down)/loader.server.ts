@@ -1,17 +1,16 @@
 import { redirect } from '@remix-run/node'
-import { api } from '~/api.server'
+import { api, type Card, type AllPages } from '~/api.server'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { getSSRData } from './components/Deck'
 import { getItem, setItem, removeItem } from '~/cache-storage.server'
-import type { GetAllPagesData, TarotCard } from '~/api.types'
 
 const HOUR_IN_SECONDS = 60 * 60
 
 export type Loader = typeof loader
 export type LoaderData = {
-	card: TarotCard,
+	card: Card,
 	deckSSRData: ReturnType<typeof getSSRData>,
-	content: GetAllPagesData,
+	content: AllPages,
 	upsideDown: boolean,
 	revealed: boolean,
 	host: string,
@@ -23,7 +22,7 @@ const getContent = async (language: string) => {
 	const value = await getItem(key);
 	if (value) {
 		try {
-			return [JSON.parse(value) as GetAllPagesData, null] as const
+			return [JSON.parse(value) as AllPages, null] as const
 		} catch (error) {
 			console.error(new Date(), 'getContent cannot parse cached value\n', error)
 			await removeItem(key)
@@ -44,7 +43,7 @@ async function getCardById({ language, id }: { language: string, id: string }) {
 	const value = await getItem(key)
 	if (value) {
 		try {
-			return [JSON.parse(value) as TarotCard | null, null] as const
+			return [JSON.parse(value) as Card | null, null] as const
 		} catch (error) {
 			console.error(new Date(), 'getCardById cannot JSON.parse cached value\n', error)
 			await removeItem(key)
@@ -110,7 +109,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const [nextCardResponse, contentResponse] = await Promise.all([
 		api.getRandomCard(
 			language,
-			{ prevPickedCards: [] },
+			[],
 		),
 		contentPromise,
 	])

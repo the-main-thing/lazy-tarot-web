@@ -8,9 +8,10 @@ import {
 	queryCardsSet,
 } from '../api.$language.get-full-tarot-set.$build-timestamp/useGetCardsSet'
 import { getPrevPickedCards, setPrevPickedCards } from './localStorage'
-import type { GetCardsSetData } from '~/api.types' 
-
-type Card = GetCardsSetData[0]
+import type {
+	CardsSet,
+	Card,
+} from '../../api.server'
 
 export type ActionData = {
 	card: Card,
@@ -41,7 +42,7 @@ export const clientAction = async ({
 
 	const prevPickedCards = getPrevPickedCards()
 
-	const cardsSet = await queryClient.fetchQuery<GetCardsSetData>({
+	const cardsSet = await queryClient.fetchQuery<CardsSet>({
 		queryKey: getKey(language),
 		queryFn: () => queryCardsSet(language),
 		staleTime: Infinity,
