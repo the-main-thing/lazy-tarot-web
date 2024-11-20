@@ -53,7 +53,6 @@ export const Img = forwardRef<HTMLImageElement, ImgProps>(
 					...props.style,
 				}}
 				loading={lazy ? 'lazy' : 'eager'}
-				decoding={lazy ? 'async' : 'auto'}
 			/>
 		)
 	},
