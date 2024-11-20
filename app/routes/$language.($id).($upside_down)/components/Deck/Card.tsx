@@ -174,7 +174,8 @@ const CardInternal = memo(
 								'w-full rounded p-0 md:hidden' +
 								(upsideDown ? ' rotate-180' : '')
 							}
-							lazy={!revealed}
+							lazy={!hydrated && !revealed}
+							decoding={revealed ? 'sync' : 'async'}
 						/>
 						<Img
 							src={front.srcSet.sm.src}
@@ -184,7 +185,8 @@ const CardInternal = memo(
 								'w-full rounded p-0 hidden md:block' +
 								(upsideDown ? ' rotate-180' : '')
 							}
-							lazy={!revealed}
+							lazy={!hydrated && !revealed}
+							decoding={revealed ? 'sync' : 'async'}
 						/>
 					</animated.div>
 				</Component>
