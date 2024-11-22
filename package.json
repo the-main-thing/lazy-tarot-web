@@ -26,8 +26,7 @@
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tarot-api": "github:the-main-thing/lazy-tarot-api#dc344f8adfb0c9d5b49fc8b762c3e930a97419ec",
-    "zod": "^3.23.8"
+		"tarot-api": "github:the-main-thing/lazy-tarot-api#8068334da11a579a62adcf96388d85cb85fad217"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.9",
