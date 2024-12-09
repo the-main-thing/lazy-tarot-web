@@ -29,7 +29,7 @@ const initialFrom: SpringStyles = {
 	opacity: 1,
 }
 
-const initialTo: SpringStyles = { ...initialFrom }
+const initialTo: SpringStyles = initialFrom
 
 const from = (
 	i: number,
